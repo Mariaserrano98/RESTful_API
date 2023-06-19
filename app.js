@@ -33,10 +33,14 @@ db.once('connected',()=>{
     console.log('Success connect ')
 })
 
+
 // nos indica que se ha desconectado la conexión correctamente
 db.on('disconnected',()=>{
     console.log('Mongoose connection disconnected')
 })
+
+const users = require('./Controller/userController');
+app.use('/users', users);
 
 app.listen(PORT, () => {
     console.log(`Server is running http://localhost:${PORT}`);
