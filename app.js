@@ -1,21 +1,43 @@
-// Cargamos modulo HTTP en el servidor
-const http = require('http');       
+const express = require('express');
+const mongoose = require('mongoose');
 
-// Declaramos el puerto donde lanzamos el servidor 
-const PORT = 8000; 
+const PORT = 8000;
 
 
-const server = http.createServer(
-// req contiene los detalles de la solicitud 
-// res envia la respuesta al cliente    
-    (req, res) =>{
-        res.statusCode = 200;
-         // Establecer el tipo de contenido que vamos a devolver
-        res.setHeader("Content-Type","text/html");
-        // Respuesta que devolvemos al cliente, en este caso tipo HTML 
-        res.end("<h1>Hola Mundo</h1></br><h2>Curso </h2>");
-    }
-).listen(PORT, () => {
-    // Imprimir el mensaje de confimación de que funciona correctamente
-    console.log(`Server running at http://localhost:${PORT}/`);
+// Así creamos la aplicación express
+const app = express();
+
+// Analizar los archivos JSON 
+app.use(express.json());
+
+// Esto nos permite obtener la información de configuración de ".env"
+require('dotenv').config();
+
+// Obtenemos la cadena de conexión a la base de datos desde las variables de entorno (fichero .env)
+const mongoUrl = process.env.DATABASE_URL_DEV;
+
+// configuración con mongoDB
+// useNewUrlParser: le indica a mongoose que utilice el nuevo analizador de url de la cadena de conexión (para evitar un error de deprecación)
+mongoose.connect(mongoUrl, { useNewUrlParser: true })
+
+// Guardar conexión con mongoose 
+const db = mongoose.connection;
+
+// Verificamos que la conexión se ha realizado correctamente, de lo contrario nos dice error 
+db.on('error',()=>{
+console.error('Error:', error)
+});
+
+// nos indica que se ha establecido la conexión correctamente
+db.once('connected',()=>{
+    console.log('Success connect ')
 })
+
+// nos indica que se ha desconectado la conexión correctamente
+db.on('disconnected',()=>{
+    console.log('Mongoose connection disconnected')
+})
+
+app.listen(PORT, () => {
+    console.log(`Server is running http://localhost:${PORT}`);
+});
